@@ -1,17 +1,136 @@
-🐔 Autonomous Indoor Navigation Rover
-Raspberry Pi • Marvelmind Beacons • ROS/Gazebo • VIPR Agricultural Robotics Lab
-📌 Overview
-This project focuses on developing an autonomous indoor navigation rover for agricultural environments, specifically poultry houses. The goal is to build a system that can localize, navigate, and eventually perform automated tasks (monitoring, data collection, welfare checks) in low-visibility indoor settings where GPS is unreliable.
-The rover uses:
-Raspberry Pi (primary onboard computer)
-Marvelmind Indoor GPS beacons for high-precision positioning
-Waveshare UGV Rover platform
-ROS + Gazebo for simulation, visualization, and testing
-Custom Python scripts for reading positions, controlling motors, and executing navigation tasks
-This README outlines the system design, setup process, file structure, and ongoing development roadmap.
-🧠 Project Goals
-Achieve real-time local positioning using Marvelmind’s ultrasonic beacon system.
-Stream X/Y/Z coordinate data to the Raspberry Pi.
-Control the rover through Python and ROS nodes.
-Run simulated navigation in Gazebo before deploying onto the physical rover.
-Build a modular framework for future add-ons (environment monitoring, vision, path planning, etc.).
+# 🐔 Autonomous Indoor Navigation Rover  
+### Raspberry Pi • Marvelmind Beacons • ROS/Gazebo • UGV Platform
+
+## Overview
+This project develops an **autonomous indoor navigation rover** for agricultural environments (specifically poultry houses). Since GPS does not work indoors, the rover uses a **Marvelmind Indoor GPS** system for centimeter-level localization, a **Raspberry Pi** as the onboard computer, and a **Waveshare UGV** platform for mobility.  
+The system combines **real-time localization**, **motor control**, and **ROS-based navigation**, with Gazebo used for simulation and testing.
+
+---
+
+## Project Goals
+- Stream accurate **X/Y/Z** positions from Marvelmind beacons to the Raspberry Pi  
+- Control rover movement using Python (GPIO/serial)  
+- Build a ROS/Gazebo simulation environment  
+- Implement autonomous waypoint navigation  
+- Develop a modular codebase for future robotics research
+
+---
+
+## System Architecture
+
+Marvelmind Beacons → Modem → Raspberry Pi → Python/ROS Navigation Scripts
+↓
+Waveshare UGV Rover
+
+
+
+**Marvelmind System**  
+- Stationary beacons map the environment  
+- Mobile beacon on rover provides real-time coordinates  
+- Modem sends location data via USB → Pi
+
+**Raspberry Pi**  
+- Reads Marvelmind serial packets  
+- Publishes position data to ROS topics  
+- Sends motor commands to the UGV
+
+---
+
+## Repository Structure
+
+poultry-rover/
+│
+├── marvelmind/
+│ ├── hedgehog.py # Parse Marvelmind packets
+│ ├── beacon_listener.py # Streams coordinates to terminal or ROS topic
+│ └── README.md
+│
+├── navigation/
+│ ├── controller.py # Controls rover movement
+│ ├── path_planning.py # Waypoint following logic
+│ ├── utils.py
+│
+├── rover/
+│ ├── ugv_driver.py # Low-level motor driver
+│ ├── manual_control.py # For testing motor responses
+│ └── hardware_tests/
+│
+├── simulation/
+│ ├── launch/
+│ │ └── gazebo.launch # Starts Gazebo simulation
+│ ├── models/
+│ └── worlds/
+│
+└── README.md
+
+
+
+
+---
+
+## Setup Instructions
+
+### 1. Flash Raspberry Pi OS
+Use Raspberry Pi Imager. Enable:
+- SSH  
+- Wi-Fi  
+- Username/password  
+
+Insert SD → Boot the Pi.
+
+---
+
+### 2. Install Dependencies
+
+```bash
+sudo apt update && sudo apt upgrade
+sudo apt install python3-pip python3-serial git ros-humble-desktop-full
+pip3 install pyserial
+
+
+Clone this repository:
+git clone https://github.com/<your-username>/poultry-rover.git
+cd poultry-rover
+3. Connect Marvelmind Modem
+Check if detected:
+ls /dev/ttyACM*
+Run listener:
+python3 marvelmind/beacon_listener.py
+You should see streaming position data.
+4. Test Rover Controls
+python3 rover/manual_control.py
+Common keys:
+w → forward
+s → stop
+a / d → turn
+x → reverse
+5. Autonomous Navigation
+Run Gazebo simulation:
+ros2 launch simulation gazebo.launch
+Start navigation node:
+ros2 run navigation controller.py
+Example waypoint list:
+waypoints = [(1.2, 0.5), (3.0, -1.0), (4.2, 2.4)]
+Current Progress
+✔ Marvelmind beacon mapping
+✔ Coordinate streaming to Raspberry Pi
+✔ Manual UGV control
+⬜ Integration with ROS navigation stack
+⬜ Autonomous waypoint execution
+⬜ Full Gazebo simulation
+Troubleshooting Notes
+Solid red LED on Pi = power OK.
+No green LED = SD card missing or OS not installed.
+Some SD cards shipped with corrupted files — reflash with Raspberry Pi Imager.
+Marvelmind modem may appear as /dev/ttyUSB0 instead of /dev/ttyACM0.
+Future Work
+Add obstacle detection sensors (camera, lidar, ultrasonic)
+Implement SLAM / Nav2
+Add data logging and environmental monitoring
+Deploy long-duration autonomous runs in poultry houses
+Contributors
+Muhammed Falih Faizal — Robotics & Navigation
+VIPR Agricultural Robotics Lab
+
+---
+
