@@ -1,5 +1,5 @@
 # 🐔 Autonomous Indoor Navigation Rover  
-### Raspberry Pi • Marvelmind Beacons • ROS/Gazebo • UGV Platform
+### Raspberry Pi • Marvelmind Beacons • UGV Platform
 
 ## Overview
 This project develops an **autonomous indoor navigation rover** for agricultural environments (specifically poultry houses). Since GPS does not work indoors, the rover uses a **Marvelmind Indoor GPS** system for centimeter-level localization, a **Raspberry Pi** as the onboard computer, and a **Waveshare UGV** platform for mobility.  
