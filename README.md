@@ -1,211 +1,160 @@
-🚙 UGV Ground Robot Project
+🚗 UGV Ground Robot Project
 Autonomous Indoor Navigation Using Raspberry Pi + Marvelmind UWB
-
---------- 
-
-System Architecture Overview
-  ┌──────────────────────────┐
-                    │    Marvelmind Dashboard   │
-                    │     (Laptop Host PC)     │
-                    └──────────────┬───────────┘
-                                   │ USB
-                                   ▼
-                         ┌───────────────────┐
-                         │  Marvelmind Modem │
-                         └───────────────────┘
-                                   │ RF/UWB
-        ┌──────────────────────────┼──────────────────────────┐
-        ▼                          ▼                          ▼
-┌──────────────┐        ┌────────────────┐         ┌─────────────────┐
-│ Fixed Beacon │        │ Fixed Beacon   │         │  Fixed Beacon   │
-│     #1       │        │      #2        │         │       #3        │
-└──────────────┘        └────────────────┘         └─────────────────┘
-                                   │
-                                   ▼
-                           ┌─────────────┐
-                           │ Mobile UWB  │
-                           │  Beacon     │
-                           └──────┬──────┘
-                                  │
-                                  ▼
-                       ┌────────────────────┐
-                       │ Waveshare UGV01    │
-                       │  (Raspberry Pi)    │
-                       └────────────────────┘
-
-This diagram shows the full information flow:
-Beacons → Modem → Laptop
-Laptop (future: Pi) → Rover
-Rover uses nav + localization to drive
 📌 Project Overview
-This project develops an indoor autonomous ground rover that uses:
-A Waveshare UGV01 mobile robot base
-A Raspberry Pi for motor logic & computation
-A Marvelmind Indoor GPS UWB system for precise localization
+This project develops an indoor autonomous rover that uses:
+A Waveshare UGV01 ground robot base
+A Raspberry Pi for motor logic and computation
+A Marvelmind Indoor GPS (UWB) system for precise localization
+Python scripts for motor control and future autonomous navigation
 Eventually, the rover will:
-Receive real-time (X, Y, Z) coordinates
-Compute how to reach target coordinates
+Receive real-time position data (X, Y, Z) from a mobile beacon
+Compute how to reach a target coordinate
 Drive autonomously without human input
 🧰 Hardware Used
-Waveshare UGV01 base
-Raspberry Pi
-Marvelmind stationary beacons
-Marvelmind mobile beacon
+Waveshare UGV01
+Raspberry Pi (UGV Compute Module)
+Marvelmind stationary beacons (fixed beacons #1, #2, #3)
+Marvelmind mobile beacon (mounted on rover)
 Marvelmind modem
-Laptop
+Laptop (for Marvelmind Dashboard + SSH into Pi)
 MicroSD card
 Power adapters
-🛠 Software Used
-✔ Marvelmind SW Pack (v8.101 – Jan 2025)
-Contains:
+🧪 Software Used
+Marvelmind SW Pack (v8.101 – Jan 2025)
 Firmware for all beacons
 NIA positioning engine
-Dashboard tools
-API
-✔ Raspberry Pi Imager
-Used to:
-Install Raspberry Pi OS
-Enable SSH
-Preconfigure WiFi
-✔ SSH Tools
-Windows CMD
-macOS Terminal
-✔ Pi Development Packages
+Marvelmind Dashboard + API tools
+Raspberry Pi Imager
+Used to install Raspberry Pi OS
+Used to enable SSH + preconfigure WiFi
+macOS Terminal / Windows CMD
+SSH access
+Debugging & networking tools
+Pi Development Packages Installed
 sudo apt update && sudo apt upgrade -y
 sudo apt install python3-pip python3-venv git -y
-🔧 System Setup
-1. Flashing Raspberry Pi OS
-Selected RPi OS (32-bit)
+⚙️ System Setup Summary
+### 1. Flash Raspberry Pi OS
+Using Raspberry Pi Imager:
+Selected Raspberry Pi OS (32-bit recommended for compatibility)
 Enabled SSH
-Enabled WiFi (UGV network)
-Flashed SD card
-Inserted into rover
-2. Connecting to UGV Network
-UGV broadcasted WiFi AP:
-UGV-XXXX
-Tested connectivity:
-ping 192.168.4.1   # UGV Controller Board
-ping 192.168.4.2   # Raspberry Pi
-ping 192.168.4.3   # Laptop
-SSH into Pi:
+Set username/password
+Added WiFi credentials
+Flashed SD card → inserted into rover
+(After boot, Pi LED turned RED + GREEN = OS loaded)
+### 2. Connect to UGV WiFi + Access Control Panel
+UGV creates its own WiFi hotspot:
+Connect laptop → network UGV-XXXX
+Open the control panel:
+http://192.168.4.1
+This dashboard allows basic manual movement (Forward, Left, Right, etc.).
+### 3. SSH into the Raspberry Pi
+Once connected to UGV WiFi:
 ssh pi@192.168.4.2
-📁 3. Project Folder Structure on Pi
-~/rover
-│
-├── motor_control/
-│   └── motor.py
-│
-├── marvelmind/
-│   └── beacon_reader.py
-│
-└── autonomous/
-    └── navigation.py
-🚦 Motor Control (motor.py)
-This script attempts to send commands to UGV to move forward/backward/turn.
-However, running it produced:
-[Errno 111] Connection refused
-This confirms:
-UGV01 does not provide a Raspberry Pi motor-control API
-No documentation
-No TCP/serial API exposed
-Movement firmware is missing
-Therefore motor.py is a placeholder.
-📡 Marvelmind Setup
-✔ Completed
-Downloaded full NIA pack
-Read entire manual
-Understood modem ↔ beacon ↔ mobile beacon system
-Determined that modem on laptop is best
-Placed fixed beacons in corners of room
-Mounted mobile beacon on rover
-❗ Pending
-Connect modem to Pi
-Implement beacon_reader.py
-Stream coordinates into navigation logic
-🧭 Navigation Logic (navigation.py)
-Will perform:
-Read current coordinates
-Calculate heading/distance error
-Send appropriate motor commands
-Stop at destination
-Currently a placeholder pending motor-control firmware.
+Default password:
+12345678
+After login → Confirmed Pi is accessible.
+### 4. File Structure Created on Raspberry Pi
+mkdir rover
+cd rover
+mkdir motor_control marvelmind autonomous
+touch motor_control/motor.py
+touch marvelmind/beacon_reader.py
+touch autonomous/navigation.py
+🧩 Code Files
+### motor_control/motor.py
+Purpose: future control of rover motors programmatically
+(Placeholder – hardware API not functional yet under generic Pi OS)
+print("Testing forward...")
+print("Testing backward...")
+print("Testing left turn...")
+print("Testing right turn...")
+### marvelmind/beacon_reader.py
+Purpose:
+Will receive X, Y, Z coordinates from the Marvelmind modem
+Parse data and forward it to navigation logic
+(Placeholder)
+# To be implemented: Interface with Marvelmind serial/USB stream
+### autonomous/navigation.py
+Purpose:
+Will compute motor commands based on target coordinates
+Will integrate beacon_reader outputs
+(Placeholder)
+# Future path planning algorithm:
+# Move rover toward (x_target, y_target)
+🛰️ Marvelmind System Setup
+What Has Been Done
+✔ Downloaded latest NIA + firmware pack
+✔ Read complete Marvelmind documentation
+✔ Understood modem–beacon–mobile beacon relationships
+✔ Decided system layout:
+Fixed beacons at room corners
+Modem connected to laptop (for debugging)
+Mobile beacon mounted on rover
+Next Step
+Integrate modem → Raspberry Pi via USB or UART.
 ⚠️ Problems Encountered
 1. Waveshare Firmware Issues
-Rover disconnects from WiFi during certain turns
-Motor system freezes with directional commands
-No downloadable UGV01 Pi image
-Backend motor-control API missing
-2. Missing Motor-Control API
-TCP commands rejected
-No listening port for motor control
-UGV01 appears incomplete or unreleased
-3. Marvelmind Challenges
-Modem not yet mapped to Pi
-Unsure whether Pi or laptop should serve as host
-Need to map serial (/dev/ttyACM0) for modem
-✅ Results Achieved
-Pi flashed and functional
-SSH communication fully working
-UGV network tested & verified
-Installed Python tools
-Created project directory structure
-Attempted motor testing (properly documented)
-Completed Marvelmind research + system mapping
-🔮 Future Work
-Acquire UGV01 motor-control firmware/API
-Enable low-level motor commands
-Receive Marvelmind (X, Y, Z) on Pi
-Complete navigation algorithm
-Use 10+ beacons for full-range mapping
-Add drone subsystem for overhead mapping
-🗂 Appendix
-A. System Screenshots (Add When Uploading)
-You should insert:
-UGV control dashboard
-Pi SSH login
-Folder tree (ls -R)
-Motor test logs
-Pi Imager configuration
-Rover internals
-Marvelmind dashboard
-B. Terminal Logs
-Ping to Pi
-Reply from 192.168.4.2: bytes=32 time=7ms TTL=64
-System Update Logs
-Temporary failure resolving 'raspbian.raspberrypi.com'
-Python Install Confirmation
-python3-pip is already the newest version.
-C. Code Snippets
-motor_control/motor.py
-import socket, time
-
-HOST = "192.168.4.1"
-PORT = 2001
-
-def send_command(cmd):
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            s.sendall(cmd.encode())
-    except Exception as e:
-        print("Error sending command:", e)
-
-print("Testing forward...")
-send_command("forward")
-time.sleep(1)
-marvelmind/beacon_reader.py
-# Placeholder for reading Marvelmind UWB position (X, Y, Z)
-def read_position():
-    pass
-autonomous/navigation.py
-# Placeholder for navigation logic based on beacon coordinates
-def navigate_to_target(x_target, y_target):
-    pass
-D. Hardware Notes
-Raspberry Pi LEDs
-Red solid: power OK
-Green blinking: SD card activity
-UGV Internal Layout
-Pi mounted on top
-Motor driver board beneath
-Beacons tracked via UWB
+Rover disconnects from WiFi when steering hard right
+Movement commands sometimes cause system to freeze
+The UGV01 motor API is unavailable under standard Raspberry Pi OS
+(because Waveshare’s custom OS image is missing)
+2. UGV01 Pi Image Missing
+The official Waveshare UGV01 Pi image no longer exists online
+Website currently shows: "Resources under urgent production"
+Control panel works but no motor controller backend on Pi
+Can’t send motor PWM commands through Linux API yet
+3. Marvelmind Integration Hurdles
+Modem ↔ Pi connection method undecided (USB? UART?)
+Need to confirm serial port visibility on Pi
+Must parse hedgehog (mobile beacon) position packets
+Multi-beacon scalability needs testing
+📈 Results So Far
+Raspberry Pi OS successfully flashed
+Full SSH access working
+UGV WiFi + control panel accessible
+File structure + placeholder control scripts created
+Marvelmind manual read and system designed
+Networking tests confirm:
+192.168.4.1 = UGV control
+192.168.4.2 = Raspberry Pi
+192.168.4.3 = Your laptop
+🚀 Future Steps
+Implement correct motor-control interface using Waveshare’s actual API
+Flash official UGV01 OS once Waveshare releases it
+Get Marvelmind modem streaming coordinates to Pi
+Integrate navigation algorithm based on (X, Y) targets
+Scale to multi-beacon + multi-rover environment
+Add drone subsystem for aerial mapping
+📎 Appendix
+A. Terminal Logs
+Update & Install Packages:
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3-pip python3-venv git -y
+Directory Tree:
+/rover
+  ├── motor_control/
+  │    └── motor.py
+  ├── marvelmind/
+  │    └── beacon_reader.py
+  └── autonomous/
+       └── navigation.py
+Ping tests:
+ping 192.168.4.1   # UGV control
+ping 192.168.4.2   # Raspberry Pi
+ping 192.168.4.3   # Laptop (self-check)
+Motor script test:
+python3 motor_control/motor.py
+Output:
+Error sending command: [Errno 111] Connection refused
+B. Images You Should Add to GitHub
+(Place in a /docs folder if needed)
+UGV control panel screenshot
+Rover interior with Raspberry Pi
+Marvelmind dashboard screenshot
+Pi boot LED indicators (red+green)
+C. SSH Log
+The authenticity of host '192.168.4.2' can't be established.
+Are you sure you want to continue connecting (yes/no)? yes
+pi@192.168.4.2's password:
+Linux ugv-pi 6.1.12 ... aarch64
